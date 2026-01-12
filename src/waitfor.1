@@ -1,0 +1,89 @@
+.TH WAITFOR 1 "January 2025" "waitfor 1.0" "User Commands"
+.SH NAME
+waitfor \- block until file(s) appear or disappear
+.SH SYNOPSIS
+.B waitfor
+.RB [ \-d ]
+.RB [ \-t
+.IR timeout ]
+.IR pathname " [" "pathname ..." ]
+.SH DESCRIPTION
+.B waitfor
+is a utility that polls for the presence or absence of files or directories.
+It is typically used in shell scripts to delay further actions until required
+resources become available or have been cleaned up.
+.PP
+By default,
+.B waitfor
+loops, testing with
+.BR stat ()
+until every file or directory named on the command line exists.
+If the
+.B \-d
+option is given, it waits until those paths have all been removed.
+.SH OPTIONS
+.TP
+.B \-d
+Wait for files/directories to be deleted (disappear) instead of appear.
+.TP
+.BI \-t " timeout"
+Timeout in seconds. Supports decimal values (e.g., 2.5).
+A timeout of 0 or omitting this option means wait indefinitely.
+.TP
+.BR \-h ", " \-\-help
+Show help message and exit.
+.SH EXIT STATUS
+.TP
+.B 0
+All specified conditions were met (files appeared or disappeared).
+.TP
+.B 1
+Timeout expired before conditions were met.
+.TP
+.B 2
+Interrupted by signal (e.g., SIGINT).
+.TP
+.B 3
+Error (invalid argument, empty path, etc.).
+.SH EXAMPLES
+Wait indefinitely for a file to appear:
+.PP
+.RS
+.nf
+waitfor /tmp/ready
+.fi
+.RE
+.PP
+Wait up to 5 seconds for /tmp/ready:
+.PP
+.RS
+.nf
+waitfor -t 5 /tmp/ready || echo "timed out"
+.fi
+.RE
+.PP
+Wait for a lock file to be removed:
+.PP
+.RS
+.nf
+waitfor -d /tmp/lockfile
+.fi
+.RE
+.PP
+Wait for multiple files:
+.PP
+.RS
+.nf
+waitfor /tmp/file1 /tmp/file2 /tmp/file3
+.fi
+.RE
+.SH NOTES
+The default polling interval is 100 milliseconds.
+.PP
+This implementation does not yet support process ID monitoring.
+.SH SEE ALSO
+.BR stat (2),
+.BR test (1),
+.BR sleep (1)
+.SH AUTHOR
+Portable implementation in Zig.
